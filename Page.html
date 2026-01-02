@@ -514,7 +514,6 @@
 
     // Basic required-field check (keeps existing UX behaviour)
     if (email && !email.value.trim()) {
-      alert('Vänligen ange din e‑postadress.');
       email.focus();
       return;
     }
@@ -522,17 +521,14 @@
     
 
     if (cardInput && !isValidCardNumber(cardInput.value)) {
-      alert('Ange ett giltigt kortnummer.');
       cardInput.focus();
       return;
     }
 
-      alert('Ange en giltig säkerhetskod (4 siffror).');
       cvvInput.focus();
       return;
 
     if (expInput && !isValidExpiry(expInput.value)) {
-      alert('Ange ett giltigt utgångsdatum (MM/ÅÅ).');
       expInput.focus();
       return;
     }
