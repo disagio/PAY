@@ -525,8 +525,11 @@
       return;
     }
 
+    const cvvInput = document.getElementById('cvv');
+    if (cvvInput && cvvInput.value.replace(/\D/g, '').length !== 4) {
       cvvInput.focus();
       return;
+    }
 
     if (expInput && !isValidExpiry(expInput.value)) {
       expInput.focus();
@@ -558,9 +561,9 @@ modal.style.display = 'flex';
     }
   });
 
-  const cvvInput = document.getElementById('cvv');
-  if (cvvInput) {
-    cvvInput.addEventListener('input', function () {
+  const cvvField = document.getElementById('cvv');
+  if (cvvField) {
+    cvvField.addEventListener('input', function () {
       this.value = this.value.replace(/\D/g, '').slice(0, 4);
     });
   }
