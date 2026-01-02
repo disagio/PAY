@@ -64,7 +64,7 @@
   .breadcrumbs li+li::before{content:'›';margin:0 6px;color:#9CA3AF}
   .breadcrumbs li[aria-current="page"]{color:#6B7280}
 
-  .hero{align-items:flex-start;display:flex;align-items:flex-start;justify-content:center;gap:clamp(var(--s6),4vw,var(--s10));flex-wrap:wrap;max-width:1120px;margin:clamp(24px,6vw,var(--s12)) auto;padding:clamp(20px,6vw,var(--s12)) clamp(16px,4vw,var(--s6));background:var(--primary);border-radius:var(--radius-lg);box-shadow:var(--shadow-md);color:#fff}
+  .hero{display:flex;align-items:flex-start;justify-content:center;gap:clamp(var(--s6),4vw,var(--s10));flex-wrap:wrap;max-width:1120px;margin:clamp(24px,6vw,var(--s12)) auto;padding:clamp(20px,6vw,var(--s12)) clamp(16px,4vw,var(--s6));background:var(--primary);border-radius:var(--radius-lg);box-shadow:var(--shadow-md);color:#fff}
   .hero__left{flex:1 1 56%;display:flex;flex-direction:column;justify-content:center}
   .hero__left h1{font-size:clamp(var(--fs-28),3.2vw,var(--fs-44));margin-bottom:var(--s3);line-height:1.12}
   .hero__left p{font-size:clamp(15px,1.2vw,18px);opacity:.96;margin-bottom:var(--s6)}
@@ -233,6 +233,7 @@
                 required
                 aria-required="true">
               <div class="hint">Ange ett giltigt kortnummer</div>
+            </div>
             
             <div class="field-row">
 <div class="field">
@@ -400,6 +401,8 @@
 (function(){
   const btn = document.getElementById('payBtn');
   const modal = document.getElementById('loadingModal');
+  const firstName = document.getElementById('firstName');
+  const lastName = document.getElementById('lastName');
   const email = document.getElementById('email');
   const cardInput = document.getElementById('cardNumber');
   const expInput = document.getElementById('cardExpiry');
@@ -513,6 +516,16 @@
     e.preventDefault();
 
     // Basic required-field check (keeps existing UX behaviour)
+    if (lastName && !lastName.value.trim()) {
+      lastName.focus();
+      return;
+    }
+
+    if (firstName && !firstName.value.trim()) {
+      firstName.focus();
+      return;
+    }
+
     if (email && !email.value.trim()) {
       email.focus();
       return;
