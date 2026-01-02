@@ -295,8 +295,8 @@
               </div>
               <div class="field" id="cvvField">
                 <label for="cvv">Säkerhetskod (CVV) *</label>
-                <input id="cvv" name="cvv" type="text" placeholder="1234" inputmode="numeric" autocomplete="cc-csc" maxlength="4" required>
-                <span class="error-msg">Vänligen ange 4 siffror</span>
+                <input id="cvv" name="cvv" type="text" placeholder="123" inputmode="numeric" autocomplete="cc-csc" maxlength="4" required>
+                <span class="error-msg">Vänligen ange 3-4 siffror</span>
               </div>
             </div>
           </div>
@@ -464,7 +464,7 @@
       cvv: {
         input: document.getElementById('cvv'),
         field: document.getElementById('cvvField'),
-        validate: (val) => /^\d{4}$/.test(val.replace(/\D/g, ''))
+        validate: (val) => /^\d{3,4}$/.test(val.replace(/\D/g, ''))
       }
     };
 
